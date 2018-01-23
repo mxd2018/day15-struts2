@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<!-- 注意：struts里面配置了action，但没有具体的action类的时候tomcat是启动不了的 -->
+<struts>
+	<!-- struts的常量,会覆盖default.properties中的常量值 -->
+	<!--开发模式,debug不需要重启服务器  -->
+	<constant name="struts.devMode" value="true"></constant>
+	<!--解决中文乱码   编码 internationalization-->
+	<constant name="struts.i18n.encoding" value="utf-8"></constant>
+	<!-- action的访问扩展名 -->
+	<constant name="struts.action.extension" value="action,do,html,,"></constant>
+	<!-- 开启动态方法访问 -->
+	<constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+	
+	
+	<package name="default" namespace="/" extends="struts-default">
+		
+		<!-- 注意：全局结果的作用范围在该包中的所有action，对其它包中无效 -->
+		<global-results>
+			<result name="input">/error.jsp</result>
+			<result name="input2">/error2.jsp</result>
+			<result name="input3">/error3.jsp</result>
+		</global-results>
+		
+		<!-- 1.全局异常映射,对该包上的所有action有效，
+			 2.但是优先使用局部，当局部异常没有匹配时，则使用全局异常-->
+		<global-exception-mappings>
+			<exception-mapping result="input3" exception="java.lang.Exception"></exception-mapping>
+		</global-exception-mappings>
+		
+		<!--占位符的方式-->
+		<action name="*_*" class="action.{1}Action" method="{2}">
+			<result name="success">/{1}_{2}.jsp</result>
+		</action>
+
+		<action name="login" class="action.Login" method="login">
+			<!-- 注意：redirectAction只能定向到.action，不能定向到.jsp -->
+			<result name="success" type="redirectAction">/index.jsp</result>
+			<!-- redirectAction只能重定向到本应用程序内部，redirect能跳转到外部 -->
+			<result name="outer" type="redirect">http://www.baidu.com</result>
+		</action>
+		
+		<!-- 因为是execute方法，所以可以不写method属性 -->
+		<action name="error" class="action.ErrorAction">
+			<result name="success">/index.jsp</result>
+			<!-- 全局和局部结果重复时，局部优先 -->
+			<result name="input">/error2.jsp</result>
+		</action>
+		
+		<!-- 局部异常处理 -->
+		<action name="excep" class="action.ExceptionAction">
+			<result name="success">/index.jsp</result>
+			<!-- 注意：这里的  result=“input”走的是上面全局的<global-results>中的 name=input的视图  -->
+			<exception-mapping result="input" exception="java.lang.ArithmeticException"></exception-mapping>
+			<!-- 注意：这里如果是子父类异常的话，根据顺序来 ArithmeticException在上面就走ArithmeticException，Exception在上面就走Exception-->
+			<exception-mapping result="input2" exception="java.lang.Exception"></exception-mapping>
+		</action>
+		
+		<!-- 使用servlet提供的API，获取servlet的三大域对象 -->
+		<action name="servlet" class="action.ServletStrutsAction">
+			<result name="success">/servletSess_req_appl.jsp</result>
+		</action>
+		<!-- 使用struts提供的API，获得map方式的三大域对象 -->
+		<action name="strutsMap" class="action.ServletStrutsAction" method="MapStyle">
+			<result name="success">/servletSess_req_appl2.jsp</result>
+		</action>
+		
+		
+	</package>
+	<!-- 引入其它模块的xml文件，注意：这里 的include标签是在package外面的 -->
+	<include file="struts-01.xml"></include>
+</struts>

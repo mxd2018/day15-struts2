@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+
+<struts>	
+	<!-- 注意：这里用了文件包含，该文件是包含在struts.xml里面的，extends是主文件包的name值 -->
+	<package name="default-01" namespace="/" extends="default">
+		
+		<!-- 动态结果的方式，通过el表达式可以获得后台参数 -->
+		<action name="adminlogin" class="action.AdminAction" method="isAdmin">
+			<result name="success" type="redirect">${flag}</result>
+		</action>
+		
+		<action name="admin">
+			<result>/index2.jsp</result>
+		</action>
+		<action name="user" >
+			<result>/index.jsp</result>
+		</action>
+		
+	</package>
+</struts>
